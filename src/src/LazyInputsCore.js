@@ -5,6 +5,9 @@ class LazyInputsCore {
         "omicron", "iota", "theta", "lambda", "kappa", "pi","mu", "rho",
         "zeta", "omega", "sigma", "psi"  
         ];
+    test2 = [
+        "This is a sentence", "It has spaces!", " We want to see what it will do! "
+    ]
 
     // Options/IO
     state = {
@@ -32,13 +35,26 @@ class LazyInputsCore {
         //     return arr;
         // }
 
-
-        // console.log(this.test1.sort());
+        console.log("Expected Output for test 1: ", this.test1.sort());
+        console.log("Expected Output for test 2: ", this.test2.sort());
 
         let z = new Trie();
-        z.insert("apple");
-        z.insert("application");
-        z.traverse(z.root, "", []);
+        let z1 = new Trie();
+
+        this.test1.forEach((v) => {
+            z.insert(v);
+        })
+
+        this.test2.forEach((v) => {
+            z1.insert(v);
+        })
+
+        // z.insert("apple");
+        // z.insert("application");
+        arr = z.traverse(z.root, "", []);
+        let arr2 = z1.traverse(z1.root, "", []);
+        console.log("Outputted for test 1: ", arr);
+        console.log("Outputted for test 2: ", arr2);
     }
 }
 
@@ -57,7 +73,6 @@ export class Trie {
         // Iteration over the word
         for (let i = 0; i < word.length; i++) {
             var c = word.charAt(i);
-            // console.log("Input Character: ", c);
 
             if (curr.children[c.charCodeAt(0) - 'a'.charCodeAt(0)] == null) {
                 // Create the node (We have never seen it)
@@ -71,29 +86,36 @@ export class Trie {
         // Mark last word as true as it ends
         curr.isWord = true;
 
-        console.log("Insertion Operation successful!");
+        // console.log("Insertion Operation successful!");
     }
 
     traverse(curr, str, arr) {
-        for (let i = 0; i < curr.children.length; i++) {
-            // We found a character that isn't null
-            if (curr.children[i] != null) {
+        // For each node we make sure we add the word once
+        let addedThisNode = false;
 
-                console.log("Output str: ", str);
-                str = str + curr.children[i].c;
-                // console.log("Output Character: ", curr.children[i].c);
-                // If we hit a node that ends with a word.
-                if (curr.isWord) {
-                    console.log("Here is the str:", str);
-                    arr.push(str);
-                }
-                // Concat character
-                this.traverse(curr.children[i],str, arr);
+        for (let i = 0; i < curr.children.length; i++) {
+            // We are currently at the end of the word
+            if (curr.isWord) {
+                // Add the final word
+                str = str + curr.c;
+                // Push it to the array
+                arr.push(str);
+                //Then we return, we know that this is a leaf node with no children
+                return;
+            } else if (curr.c !== '' && curr.c !== '\0' && (!addedThisNode)) {
+                // We add the character to the string we are building
+                str = str + curr.c;
+                addedThisNode = true;
             }
+
+            // We found a character that isn't null, traverse to it
+            if (curr.children[i] != null) {
+                this.traverse(curr.children[i],str, arr); // Recursion call
+            }   
         }
 
-        console.log("return str", str);
-        return;
+        // console.log("return str", str);
+        return arr;
     }
 }
 
